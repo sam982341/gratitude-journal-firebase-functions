@@ -4,18 +4,6 @@ const admin = require('firebase-admin');
 const app = require('express')();
 const firebase = require('firebase');
 
-// Web app's Firebase configuration
-const firebaseConfig = {
-	apiKey: 'AIzaSyA9uRQn3A503LxgPlwGiVeJP54QTvUUZ9s',
-	authDomain: 'gratitudejournal-a722b.firebaseapp.com',
-	databaseURL: 'https://gratitudejournal-a722b.firebaseio.com',
-	projectId: 'gratitudejournal-a722b',
-	storageBucket: 'gratitudejournal-a722b.appspot.com',
-	messagingSenderId: '107394676945',
-	appId: '1:107394676945:web:8ee797616456be3d4b2df0',
-	measurementId: 'G-S6Z4474CFX',
-};
-
 // Initialize firebase app and express
 firebase.initializeApp(firebaseConfig);
 admin.initializeApp();

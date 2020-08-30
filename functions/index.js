@@ -4,10 +4,10 @@ const fs = require('fs');
 const admin = require('firebase-admin');
 const app = require('express')();
 const firebase = require('firebase');
-const config = require('./config.js');
+const firebaseConfig = require('./firebaseConfig.js');
 
 // Initialize firebase app and express
-firebase.initializeApp(config.firebaseConfig);
+firebase.initializeApp(firebaseConfig.firebaseConfig);
 admin.initializeApp();
 
 // Get all posts

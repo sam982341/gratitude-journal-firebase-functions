@@ -1,11 +1,13 @@
 // Import packages
 const functions = require('firebase-functions');
+const fs = require('fs');
 const admin = require('firebase-admin');
 const app = require('express')();
 const firebase = require('firebase');
+const config = require('./config.js');
 
 // Initialize firebase app and express
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(config.firebaseConfig);
 admin.initializeApp();
 
 // Get all posts

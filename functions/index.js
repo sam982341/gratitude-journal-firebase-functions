@@ -7,7 +7,7 @@ const { userSignUp, userLogin, uploadImage } = require('./handlers/users');
 
 const { FBAuth } = require('./util/FBAuth');
 
-// Posts Routes
+// Posts Routes a
 app.get('/posts', getAllPosts);
 app.post('/post', FBAuth, createPost);
 

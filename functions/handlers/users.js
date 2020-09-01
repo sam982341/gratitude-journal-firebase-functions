@@ -102,6 +102,7 @@ exports.uploadImage = (req, res) => {
 
 	let imageFileName;
 	let imageToBeUploaded = {};
+	let name = 'a';
 
 	busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
 		if (mimetype !== 'image/png' && mimetype !== 'image/jpeg') {

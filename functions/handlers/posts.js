@@ -1,5 +1,6 @@
 const { db } = require('../util/admin');
 
+// Get all posts
 exports.getAllPosts = (req, res) => {
 	db.collection('posts')
 		.orderBy('createdAt', 'desc')

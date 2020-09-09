@@ -8,7 +8,7 @@ const {
 } = require('../util/validators');
 
 // Initialize firebase config
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig.firebaseConfig);
 
 // Sign up as a user
 exports.userSignUp = (req, res) => {
@@ -46,7 +46,7 @@ exports.userSignUp = (req, res) => {
 				handle: newUser.handle,
 				email: newUser.email,
 				createdAt: new Date().toISOString(),
-				imageUrl: `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}/o/noImg.png?alt=media`,
+				imageUrl: `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.firebaseConfig.storageBucket}/o/noImg.png?alt=media`,
 				userId,
 			};
 			db.doc(`/users/${newUser.handle}`).set(userCredentials);

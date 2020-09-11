@@ -18,6 +18,8 @@ const {
 	uploadImage,
 	updateDetails,
 	getAuthenticatedUser,
+	getUserDetails,
+	markNotificationsRead,
 } = require('./handlers/users');
 
 const { FBAuth } = require('./util/FBAuth');
@@ -49,12 +51,15 @@ app.post('/post/:postId/comment', FBAuth, postComment);
 app.post('/signup', userSignUp);
 // Login
 app.post('/login', userLogin);
-// Upload Image
+// Upload image
 app.post('/user/image', FBAuth, uploadImage);
-// Update Details
+// Update details
 app.post('/user', FBAuth, updateDetails);
-// Get Your Own Details
+// Get your wwn details
 app.get('/user', FBAuth, getAuthenticatedUser);
+// Get a specific user's details
+app.get('/user/:handle', getUserDetails);
+app.post('/notifications', FBAuth, markNotificationsRead);
 
 exports.api = functions.https.onRequest(app);
 

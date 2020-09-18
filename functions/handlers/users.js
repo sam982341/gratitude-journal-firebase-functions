@@ -113,9 +113,10 @@ exports.updateDetails = (req, res) => {
 };
 
 // Get user's own details
+// Get own user details
 exports.getAuthenticatedUser = (req, res) => {
 	let userData = {};
-	db.doc(`users/${req.user.handle}`)
+	db.doc(`/users/${req.user.handle}`)
 		.get()
 		.then((doc) => {
 			if (doc.exists) {
@@ -132,7 +133,7 @@ exports.getAuthenticatedUser = (req, res) => {
 				userData.likes.push(doc.data());
 			});
 			return db
-				.collection('notification')
+				.collection('notifications')
 				.where('recipient', '==', req.user.handle)
 				.orderBy('createdAt', 'desc')
 				.limit(10)
@@ -150,12 +151,12 @@ exports.getAuthenticatedUser = (req, res) => {
 					read: doc.data().read,
 					notificationId: doc.id,
 				});
-				return res.json(userData);
 			});
+			return res.json(userData);
 		})
 		.catch((err) => {
 			console.error(err);
-			res.status(500).json({ error: err.code });
+			return res.status(500).json({ error: err.code });
 		});
 };
 

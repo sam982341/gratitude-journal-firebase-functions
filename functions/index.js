@@ -82,7 +82,7 @@ exports.createNotificationOnLike = functions.firestore
 					doc.exists &&
 					doc.data().userHandle !== snapshot.data().userHandle
 				) {
-					return db.doc(`/notification/${snapshot.id}`).set({
+					return db.doc(`/notifications/${snapshot.id}`).set({
 						recipient: doc.data().userHandle,
 						sender: snapshot.data().userHandle,
 						read: false,
@@ -103,7 +103,7 @@ exports.deleteNotificationOnUnlike = functions.firestore
 	.document('likes/{id}')
 	.onDelete((snapshot) => {
 		return db
-			.doc(`/notification/${snapshot.id}`)
+			.doc(`/notifications/${snapshot.id}`)
 			.delete()
 			.catch((err) => {
 				console.error(err);
@@ -123,7 +123,7 @@ exports.createNotificationOnComment = functions.firestore
 					doc.exists &&
 					doc.data().userHandle !== snapshot.data().userHandle
 				) {
-					return db.doc(`/notification/${snapshot.id}`).set({
+					return db.doc(`/notifications/${snapshot.id}`).set({
 						recipient: doc.data().userHandle,
 						sender: snapshot.data().userHandle,
 						read: false,

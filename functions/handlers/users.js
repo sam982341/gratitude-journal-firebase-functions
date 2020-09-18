@@ -1,6 +1,7 @@
 const { admin, db } = require('../util/admin');
 const firebase = require('firebase');
 const firebaseConfig = require('../util/firebaseConfig.js');
+const { uuid } = require('uuidv4');
 const {
 	validateSignupData,
 	validateLoginData,
@@ -160,7 +161,7 @@ exports.getAuthenticatedUser = (req, res) => {
 		});
 };
 
-// Upload a profile image for a user
+// Upload a profile image refactored
 exports.uploadImage = (req, res) => {
 	const BusBoy = require('busboy');
 	const path = require('path');
@@ -169,45 +170,51 @@ exports.uploadImage = (req, res) => {
 
 	const busboy = new BusBoy({ headers: req.headers });
 
-	let imageFileName;
 	let imageToBeUploaded = {};
-	let name = 'a';
+	let imageFileName;
+	// String for image token
+	let generatedToken = uuid();
 
 	busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-		if (mimetype !== 'image/png' && mimetype !== 'image/jpeg') {
+		console.log(fieldname, file, filename, encoding, mimetype);
+		if (mimetype !== 'image/jpeg' && mimetype !== 'image/png') {
 			return res.status(400).json({ error: 'Wrong file type submitted' });
 		}
-
+		// my.image.png => ['my', 'image', 'png']
 		const imageExtension = filename.split('.')[filename.split('.').length - 1];
+		// 32756238461724837.png
 		imageFileName = `${Math.round(
 			Math.random() * 1000000000000
 		).toString()}.${imageExtension}`;
-		const filePath = path.join(os.tmpdir(), imageFileName);
-		imageToBeUploaded = { filePath, mimetype };
-		file.pipe(fs.createWriteStream(filePath));
+		const filepath = path.join(os.tmpdir(), imageFileName);
+		imageToBeUploaded = { filepath, mimetype };
+		file.pipe(fs.createWriteStream(filepath));
 	});
 	busboy.on('finish', () => {
 		admin
 			.storage()
 			.bucket()
-			.upload(imageToBeUploaded.filePath, {
+			.upload(imageToBeUploaded.filepath, {
 				resumable: false,
 				metadata: {
 					metadata: {
 						contentType: imageToBeUploaded.mimetype,
+						//Generate token to be appended to imageUrl
+						firebaseStorageDownloadTokens: generatedToken,
 					},
 				},
 			})
 			.then(() => {
+				// Append token to url
 				const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.firebaseConfig.storageBucket}/o/${imageFileName}?alt=media`;
 				return db.doc(`/users/${req.user.handle}`).update({ imageUrl });
 			})
 			.then(() => {
-				return res.json({ message: 'Image successfully uploaded' });
+				return res.json({ message: 'image uploaded successfully' });
 			})
 			.catch((err) => {
 				console.error(err);
-				return res.status(500).json({ error: err.code });
+				return res.status(500).json({ error: 'something went wrong' });
 			});
 	});
 	busboy.end(req.rawBody);

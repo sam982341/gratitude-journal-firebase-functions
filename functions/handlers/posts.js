@@ -147,7 +147,7 @@ exports.likePost = (req, res) => {
 						return postDocument.update({ likeCount: postData.likeCount });
 					})
 					.then(() => {
-						return res.json({ postData });
+						return res.json(postData);
 					});
 			} else {
 				return res.status(400).json({ error: 'Post already liked' });

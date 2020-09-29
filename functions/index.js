@@ -24,6 +24,7 @@ const {
 	getAuthenticatedUser,
 	getUserDetails,
 	markNotificationsRead,
+	getUserProfile,
 } = require('./handlers/users');
 
 const { FBAuth } = require('./util/FBAuth');
@@ -61,11 +62,13 @@ app.post('/login', userLogin);
 app.post('/user/image', FBAuth, uploadImage);
 // Update details
 app.post('/user', FBAuth, updateDetails);
-// Get your wwn details
+// Get your own details
 app.get('/user', FBAuth, getAuthenticatedUser);
 // Get a specific user's details
 app.get('/user/:handle', getUserDetails);
 app.post('/notifications', FBAuth, markNotificationsRead);
+// Get a specific user's profile details
+app.get('/user/:handle/profile', getUserProfile);
 
 exports.api = functions.https.onRequest(app);
 

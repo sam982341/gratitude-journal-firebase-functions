@@ -161,6 +161,25 @@ exports.getAuthenticatedUser = (req, res) => {
 		});
 };
 
+// Get a specific user's profile details
+exports.getUserProfile = (req, res) => {
+	let userData = {};
+	db.doc(`/users/${req.params.handle}`)
+		.get()
+		.then((doc) => {
+			if (doc.exists) {
+				userData.user = doc.data();
+			} else {
+				return res.status(404).json({ error: 'User not found' });
+			}
+			res.json(userData);
+		})
+		.catch((err) => {
+			console.error(err);
+			res.status(500).json({ error: err.code });
+		});
+};
+
 // Upload a profile image refactored
 exports.uploadImage = (req, res) => {
 	const BusBoy = require('busboy');

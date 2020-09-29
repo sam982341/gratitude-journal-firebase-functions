@@ -83,28 +83,39 @@ exports.createPost = (req, res) => {
 
 // Get all posts from a specific user
 exports.getUsersPosts = (req, res) => {
-	const posts = db.collection('posts');
-	const usersPosts = posts.where('userHandle', '==', req.params.handle);
-
-	usersPosts
-		.orderBy('createdAt', 'desc')
+	db.doc(`/users/${req.params.handle}`)
 		.get()
-		.then((data) => {
-			let posts = [];
-			data.forEach((doc) => {
-				posts.push({
-					postId: doc.id,
-					body: doc.data().body,
-					userHandle: doc.data().userHandle,
-					commentCount: doc.data().commentCount,
-					likeCount: doc.data().likeCount,
-					createdAt: doc.data().createdAt,
-					userImage: doc.data().userImage,
-				});
-			});
-			return res.json(posts);
-		})
-		.catch((err) => console.error(err));
+		.then((doc) => {
+			if (doc.exists) {
+				const posts = db.collection('posts');
+				const usersPosts = posts.where('userHandle', '==', req.params.handle);
+
+				usersPosts
+					.orderBy('createdAt', 'desc')
+					.get()
+					.then((data) => {
+						let posts = [];
+						data.forEach((doc) => {
+							posts.push({
+								postId: doc.id,
+								body: doc.data().body,
+								userHandle: doc.data().userHandle,
+								commentCount: doc.data().commentCount,
+								likeCount: doc.data().likeCount,
+								createdAt: doc.data().createdAt,
+								userImage: doc.data().userImage,
+							});
+						});
+						return res.json(posts);
+					})
+					.catch((err) => {
+						console.error(err);
+						return res.json({ error: err.code });
+					});
+			} else {
+				return res.status(404).json({ error: 'User not found' });
+			}
+		});
 };
 
 // Comment on a post

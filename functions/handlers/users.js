@@ -222,7 +222,7 @@ exports.uploadImage = (req, res) => {
 
 exports.getUserDetails = (req, res) => {
 	let userData = {};
-	db.doc(`users/${req.params.handle}`)
+	db.doc(`/users/${req.params.handle}`)
 		.get()
 		.then((doc) => {
 			if (doc.exists) {

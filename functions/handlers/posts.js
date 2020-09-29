@@ -55,6 +55,10 @@ exports.getPost = (req, res) => {
 
 // Create a post
 exports.createPost = (req, res) => {
+	if (req.body.body.trim() === '') {
+		return res.status(400).json({ body: 'Body must not be empty' });
+	}
+
 	const newPost = {
 		body: req.body.body,
 		userHandle: req.user.handle,
@@ -75,6 +79,32 @@ exports.createPost = (req, res) => {
 			res.status(500).json({ error: 'something went wrong' });
 			console.error(err);
 		});
+};
+
+// Get all posts from a specific user
+exports.getUsersPosts = (req, res) => {
+	const posts = db.collection('posts');
+	const usersPosts = posts.where('userHandle', '==', req.params.handle);
+
+	usersPosts
+		.orderBy('createdAt', 'desc')
+		.get()
+		.then((data) => {
+			let posts = [];
+			data.forEach((doc) => {
+				posts.push({
+					postId: doc.id,
+					body: doc.data().body,
+					userHandle: doc.data().userHandle,
+					commentCount: doc.data().commentCount,
+					likeCount: doc.data().likeCount,
+					createdAt: doc.data().createdAt,
+					userImage: doc.data().userImage,
+				});
+			});
+			return res.json(posts);
+		})
+		.catch((err) => console.error(err));
 };
 
 // Comment on a post

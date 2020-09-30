@@ -54,7 +54,7 @@ app.get('/users/:handle/posts', getUsersPosts);
 // Get All Posts Infinite Scroll
 app.get('/posts/infinite', getAllPostsInfinite);
 // Get All Posts Infinite Scroll Next Set
-app.get('/posts/infinite/next', getAllPostsInfiniteNext);
+app.post('/posts/infinite/next', getAllPostsInfiniteNext);
 
 //////////////////////////////////////////////////////////////////
 // User Routes

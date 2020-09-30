@@ -179,7 +179,7 @@ exports.getAllPostsInfinite = (req, res) => {
 exports.getAllPostsInfiniteNext = (req, res) => {
 	db.collection('posts')
 		.orderBy('createdAt', 'desc')
-		.startAt(req.body.lastVisible.createdAt)
+		.startAt(req.body.lastVisible)
 		.limit(10)
 		.get()
 		.then((data) => {

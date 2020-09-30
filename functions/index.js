@@ -15,6 +15,8 @@ const {
 	unlikePost,
 	deletePost,
 	getUsersPosts,
+	getAllPostsInfinite,
+	getAllPostsInfiniteNext,
 } = require('./handlers/posts');
 const {
 	userSignUp,
@@ -49,6 +51,10 @@ app.get('/post/:postId/unlike', FBAuth, unlikePost);
 app.post('/post/:postId/comment', FBAuth, postComment);
 // Get All User Posts
 app.get('/users/:handle/posts', getUsersPosts);
+// Get All Posts Infinite Scroll
+app.get('/posts/infinite', getAllPostsInfinite);
+// Get All Posts Infinite Scroll Next Set
+app.get('/posts/infinite/next', getAllPostsInfiniteNext);
 
 //////////////////////////////////////////////////////////////////
 // User Routes

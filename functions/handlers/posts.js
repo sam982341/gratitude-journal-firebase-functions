@@ -152,6 +152,54 @@ exports.postComment = (req, res) => {
 		});
 };
 
+// Get all posts infinite scroll
+exports.getAllPostsInfinite = (req, res) => {
+	db.collection('posts')
+		.orderBy('createdAt', 'desc')
+		.limit(10)
+		.get()
+		.then((data) => {
+			let posts = [];
+			data.forEach((doc) => {
+				posts.push({
+					postId: doc.id,
+					body: doc.data().body,
+					userHandle: doc.data().userHandle,
+					commentCount: doc.data().commentCount,
+					likeCount: doc.data().likeCount,
+					createdAt: doc.data().createdAt,
+					userImage: doc.data().userImage,
+				});
+			});
+			return res.json(posts);
+		})
+		.catch((err) => console.error(err));
+};
+
+exports.getAllPostsInfiniteNext = (req, res) => {
+	db.collection('posts')
+		.orderBy('createdAt', 'desc')
+		.startAt(req.body.lastVisible.createdAt)
+		.limit(10)
+		.get()
+		.then((data) => {
+			let posts = [];
+			data.forEach((doc) => {
+				posts.push({
+					postId: doc.id,
+					body: doc.data().body,
+					userHandle: doc.data().userHandle,
+					commentCount: doc.data().commentCount,
+					likeCount: doc.data().likeCount,
+					createdAt: doc.data().createdAt,
+					userImage: doc.data().userImage,
+				});
+			});
+			return res.json(posts);
+		})
+		.catch((err) => console.error(err));
+};
+
 // Like a post
 exports.likePost = (req, res) => {
 	const likeDocument = db

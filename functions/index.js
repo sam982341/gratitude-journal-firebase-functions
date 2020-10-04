@@ -17,6 +17,7 @@ const {
 	getUsersPosts,
 	getAllPostsInfinite,
 	getAllPostsInfiniteNext,
+	getUsersPostsNext,
 } = require('./handlers/posts');
 const {
 	userSignUp,
@@ -49,8 +50,10 @@ app.get('/post/:postId/like', FBAuth, likePost);
 app.get('/post/:postId/unlike', FBAuth, unlikePost);
 // Comment on a Post
 app.post('/post/:postId/comment', FBAuth, postComment);
-// Get All User Posts
+// Get First 10 User Posts
 app.get('/users/:handle/posts', getUsersPosts);
+// Get User Posts Next
+app.post('/users/:handle/posts/next', getUsersPostsNext);
 // Get All Posts Infinite Scroll
 app.get('/posts/infinite', getAllPostsInfinite);
 // Get All Posts Infinite Scroll Next Set

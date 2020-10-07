@@ -67,3 +67,6 @@ node_modules/
 
 # ignore firebase config file
 firebaseConfig.js
+
+# ignore sendgrid api
+sendgrid.env

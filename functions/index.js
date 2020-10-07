@@ -85,10 +85,10 @@ exports.api = functions.https.onRequest(app);
 // Sendgrid API Test
 //////////////////////////////////////////////////////////////////
 
-// using Twilio SendGrid's v3 Node.js Library
-// https://github.com/sendgrid/sendgrid-nodejs
 const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const { sendgridApiKey } = require('./util/firebaseConfig');
+sgMail.setApiKey(sendgridApiKey);
+
 const msg = {
 	to: 'test@example.com', // Change to your recipient
 	from: 'test@example.com', // Change to your verified sender

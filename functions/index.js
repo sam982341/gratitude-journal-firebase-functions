@@ -88,24 +88,24 @@ exports.api = functions.https.onRequest(app);
 const sgMail = require('@sendgrid/mail');
 const { sendgridApiKey } = require('./util/firebaseConfig');
 sgMail.setApiKey(sendgridApiKey);
+sgMail.setSubstitutionWrappers('{{', '}}');
 
-const msg = {
-	to: 'test@example.com', // Change to your recipient
-	from: 'test@example.com', // Change to your verified sender
-	subject: 'Sending with SendGrid is Fun',
-	text: 'and easy to do anywhere, even with Node.js',
-	html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-};
-sgMail
-	.send(msg)
-	.then(() => {
-		console.log('Email sent');
-	})
-	.catch((error) => {
-		console.error(error);
-	});
+// Send an email when a new person signs up
+exports.sendWelcomeEmail = functions.auth.user().onCreate((user) => {
+	const email = user.email;
+	console.log(email);
+	const msg = {
+		to: email,
+		from: 'hello@grtfl.io',
+		subject: 'Sending with SendGrid is Fun',
+		templateId: 'd-f168ee6fe0b44424b780027b60bf90c4',
+	};
 
-console.log('test');
+	sgMail
+		.send(msg)
+		.then(() => console.log('message sent'))
+		.catch((err) => console.error(err));
+});
 
 //////////////////////////////////////////////////////////////////
 // Cloud Firestore Triggers
@@ -183,9 +183,6 @@ exports.createNotificationOnComment = functions.firestore
 exports.onUserImageChange = functions.firestore
 	.document('/users/{userId}')
 	.onUpdate((change) => {
-		console.log(change.before.data());
-		console.log(change.after.data());
-
 		if (change.before.data().imageUrl !== change.after.data().imageUrl) {
 			console.log('image has changed');
 			let batch = db.batch();

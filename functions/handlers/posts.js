@@ -36,7 +36,7 @@ exports.getPost = (req, res) => {
 			postData.postId = doc.id;
 			return db
 				.collection('comments')
-				.orderBy('createdAt', 'desc')
+				.orderBy('createdAt', 'asc')
 				.where('postId', '==', req.params.postId)
 				.get();
 		})

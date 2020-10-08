@@ -1,6 +1,8 @@
 const { admin, db } = require('../util/admin');
 const firebase = require('firebase');
 const firebaseConfig = require('../util/firebaseConfig.js');
+const sgMail = require('@sendgrid/mail');
+const { sendgridApiKey } = require('../util/firebaseConfig');
 const { uuid } = require('uuidv4');
 const {
 	validateSignupData,

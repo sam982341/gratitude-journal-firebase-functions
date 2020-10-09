@@ -10,7 +10,17 @@ const isEmail = (email) => {
 
 // String validation helper functions
 const isEmpty = (string) => {
+	console.log(string);
 	if (string.trim() === '') {
+		return true;
+	} else {
+		return false;
+	}
+};
+
+const isAlphaNumeric = (handle) => {
+	const alphaNumericRegex = /^[a-zA-Z0-9_]*$/;
+	if (handle.match(alphaNumericRegex)) {
 		return true;
 	} else {
 		return false;
@@ -33,8 +43,14 @@ exports.validateSignupData = (data) => {
 		errors.confirmPassword = 'Passwords must match';
 
 	// Validate handle
-	if (isEmpty(data.handle)) errors.handle = 'Must not be empty';
+	if (isEmpty(data.handle)) {
+		errors.handle = 'Must not be empty';
+	} else if (!isAlphaNumeric(data.handle)) {
+		errors.handle =
+			'Must only contain alphanumeric characters (or underscores)';
+	}
 
+	//if (data.handle)
 	// Check if any errors in error object
 
 	return {

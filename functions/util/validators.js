@@ -10,7 +10,6 @@ const isEmail = (email) => {
 
 // String validation helper functions
 const isEmpty = (string) => {
-	console.log(string);
 	if (string.trim() === '') {
 		return true;
 	} else {

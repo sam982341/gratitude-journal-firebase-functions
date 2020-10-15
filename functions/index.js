@@ -2,6 +2,7 @@
 const functions = require('firebase-functions');
 const app = require('express')();
 const { db } = require('./util/admin');
+const dayjs = require('dayjs');
 
 const cors = require('cors');
 app.use(cors());
@@ -75,6 +76,7 @@ app.post('/user', FBAuth, updateDetails);
 app.get('/user', FBAuth, getAuthenticatedUser);
 // Get a specific user's details
 app.get('/user/:handle', getUserDetails);
+// Mark notifications as read
 app.post('/notifications', FBAuth, markNotificationsRead);
 // Get a specific user's profile details
 app.get('/user/:handle/profile', getUserProfile);
@@ -93,7 +95,6 @@ sgMail.setSubstitutionWrappers('{{', '}}');
 // Send an email when a new person signs up
 exports.sendWelcomeEmail = functions.auth.user().onCreate((user) => {
 	const email = user.email;
-	console.log(email);
 	const msg = {
 		to: email,
 		from: 'hello@grtfl.io',
@@ -200,6 +201,7 @@ exports.onUserImageChange = functions.firestore
 		} else return true;
 	});
 
+// Delete notifications and comments when a post is deleted
 exports.onPostDelete = functions.firestore
 	.document('/posts/{postId}')
 	.onDelete((snapshot, context) => {
@@ -231,4 +233,83 @@ exports.onPostDelete = functions.firestore
 				return batch.commit();
 			})
 			.catch((err) => console.error(err));
+	});
+
+// firebase deploy --only "functions:incrementDailyStreakOnPost"
+// Increment daily streak when someone creates a post
+exports.incrementDailyStreakOnPost = functions.firestore
+	.document('/posts/{postId}')
+	.onCreate((snapshot) => {
+		return db
+			.doc(`/users/${snapshot.data().userHandle}`)
+			.get()
+			.then((doc) => {
+				if (doc.exists) {
+					if (!doc.data().postedToday) {
+						return doc.ref.update({
+							dailyStreak: doc.data().dailyStreak + 1,
+							postedToday: true,
+						});
+					}
+				}
+			})
+			.catch((err) => console.log(err));
+	});
+
+// firebase deploy --only "functions:scheduledFunction"
+// Reset the postedToday bool for all users at 4am EST
+exports.scheduledFunction = functions.pubsub
+	.schedule('every day 04:00')
+	.timeZone('America/New_York')
+	.onRun((context) => {
+		let batch = db.batch();
+		return db
+			.collection('users')
+			.where('postedToday', '==', true)
+			.get()
+			.then((data) => {
+				data.forEach((doc) => {
+					batch.update(doc.ref, { postedToday: false });
+				});
+				return batch.commit();
+			})
+			.catch((err) => console.log(err));
+	});
+
+// firebase deploy --only "functions:resetDailyPostStreak"
+// Reset the daily streak to 0 if someone has not posted
+exports.resetDailyPostStreak = functions.pubsub
+	.schedule('every day 03:55')
+	.timeZone('America/New_York')
+	.onRun((context) => {
+		let batch = db.batch();
+		return db
+			.collection('users')
+			.where('postedToday', '==', false)
+			.get()
+			.then((data) => {
+				data.forEach((doc) => {
+					batch.update(doc.ref, { dailyStreak: 0 });
+				});
+				return batch.commit();
+			})
+			.catch((err) => console.log(err));
+	});
+
+// firebase deploy --only "functions:oneTimeSetStreak"
+exports.oneTimeSetStreak = functions.pubsub
+	.schedule('every day 22:55')
+	.timeZone('America/New_York')
+	.onRun((context) => {
+		let batch = db.batch();
+		return db
+			.collection('users')
+			.get()
+			.then((data) => {
+				data.forEach((doc) => {
+					batch.update(doc.ref, { dailyStreak: 0, postedToday: false });
+				});
+				return batch.commit();
+			})
+			.catch((err) => console.log(err));
 	});

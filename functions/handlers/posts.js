@@ -59,6 +59,8 @@ exports.createPost = (req, res) => {
 		return res.status(400).json({ body: 'Body must not be empty' });
 	}
 
+	console.log(req.user);
+
 	const newPost = {
 		body: req.body.body,
 		userHandle: req.user.handle,
@@ -66,6 +68,7 @@ exports.createPost = (req, res) => {
 		userImage: req.user.imageUrl,
 		likeCount: 0,
 		commentCount: 0,
+		dailyStreak: req.user.dailyStreak,
 	};
 
 	db.collection('posts')
@@ -105,6 +108,7 @@ exports.getUsersPosts = (req, res) => {
 								likeCount: doc.data().likeCount,
 								createdAt: doc.data().createdAt,
 								userImage: doc.data().userImage,
+								dailyStreak: doc.data().dailyStreak,
 							});
 						});
 						return res.json(posts);
@@ -143,6 +147,7 @@ exports.getUsersPostsNext = (req, res) => {
 								likeCount: doc.data().likeCount,
 								createdAt: doc.data().createdAt,
 								userImage: doc.data().userImage,
+								dailyStreak: doc.data().dailyStreak,
 							});
 						});
 						return res.json(posts);
@@ -208,6 +213,7 @@ exports.getAllPostsInfinite = (req, res) => {
 					likeCount: doc.data().likeCount,
 					createdAt: doc.data().createdAt,
 					userImage: doc.data().userImage,
+					dailyStreak: doc.data().dailyStreak,
 				});
 			});
 			return res.json(posts);
@@ -232,6 +238,7 @@ exports.getAllPostsInfiniteNext = (req, res) => {
 					likeCount: doc.data().likeCount,
 					createdAt: doc.data().createdAt,
 					userImage: doc.data().userImage,
+					dailyStreak: doc.data().dailyStreak,
 				});
 			});
 			return res.json(posts);

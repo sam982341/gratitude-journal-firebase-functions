@@ -181,11 +181,11 @@ exports.createNotificationOnComment = functions.firestore
 			});
 	});
 
+// When a user updated their image, update all posts
 exports.onUserImageChange = functions.firestore
 	.document('/users/{userId}')
 	.onUpdate((change) => {
 		if (change.before.data().imageUrl !== change.after.data().imageUrl) {
-			console.log('image has changed');
 			let batch = db.batch();
 			return db
 				.collection('posts')
@@ -195,6 +195,28 @@ exports.onUserImageChange = functions.firestore
 					data.forEach((doc) => {
 						const post = db.doc(`/posts/${doc.id}`);
 						batch.update(post, { userImage: change.after.data().imageUrl });
+					});
+					return batch.commit();
+				});
+		} else return true;
+	});
+
+// When a users streak updates, update all posts
+exports.onUserStreakCountChange = functions.firestore
+	.document('/users/{userId}')
+	.onUpdate((change) => {
+		if (change.before.data().dailyStreak !== change.after.data().dailyStreak) {
+			let batch = db.batch();
+			return db
+				.collection('posts')
+				.where('userHandle', '==', change.before.data().handle)
+				.get()
+				.then((data) => {
+					data.forEach((doc) => {
+						const post = db.doc(`/posts/${doc.id}`);
+						batch.update(post, {
+							dailyStreak: change.after.data().dailyStreak,
+						});
 					});
 					return batch.commit();
 				});
@@ -256,9 +278,9 @@ exports.incrementDailyStreakOnPost = functions.firestore
 			.catch((err) => console.log(err));
 	});
 
-// firebase deploy --only "functions:scheduledFunction"
+// firebase deploy --only "functions:dailyPostStreakReset"
 // Reset the postedToday bool for all users at 4am EST
-exports.scheduledFunction = functions.pubsub
+exports.dailyPostStreakReset = functions.pubsub
 	.schedule('every day 04:00')
 	.timeZone('America/New_York')
 	.onRun((context) => {

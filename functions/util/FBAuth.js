@@ -28,6 +28,7 @@ exports.FBAuth = (req, res, next) => {
 			// console.log(data);
 			req.user.handle = data.docs[0].data().handle;
 			req.user.imageUrl = data.docs[0].data().imageUrl;
+			req.user.dailyStreak = data.docs[0].data().dailyStreak;
 			return next();
 		})
 		.catch((err) => {

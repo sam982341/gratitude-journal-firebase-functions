@@ -295,21 +295,3 @@ exports.resetDailyPostStreak = functions.pubsub
 			})
 			.catch((err) => console.log(err));
 	});
-
-// firebase deploy --only "functions:oneTimeSetStreak"
-exports.oneTimeSetStreak = functions.pubsub
-	.schedule('every day 22:55')
-	.timeZone('America/New_York')
-	.onRun((context) => {
-		let batch = db.batch();
-		return db
-			.collection('users')
-			.get()
-			.then((data) => {
-				data.forEach((doc) => {
-					batch.update(doc.ref, { dailyStreak: 0, postedToday: false });
-				});
-				return batch.commit();
-			})
-			.catch((err) => console.log(err));
-	});

@@ -43,7 +43,9 @@ exports.getPost = (req, res) => {
 		.then((data) => {
 			postData.comments = [];
 			data.forEach((doc) => {
-				postData.comments.push(doc.data());
+				let commentData = doc.data();
+				commentData.commentId = doc.id;
+				postData.comments.push(commentData);
 			});
 			return res.json(postData);
 		})
@@ -347,6 +349,30 @@ exports.deletePost = (req, res) => {
 		.then((doc) => {
 			if (!doc.exists) {
 				return res.status(404).json({ error: 'Post not found' });
+			} else if (doc.data().handle !== req.user.userHandle) {
+				return res.status(403).json({ error: 'Unauthorized' });
+			} else {
+				return document.delete();
+			}
+		})
+		.then(() => {
+			res.json({ message: 'Document deleted successfully' });
+		})
+		.catch((err) => {
+			console.error(err);
+			res.status(500).json({ error: err.code });
+		});
+};
+
+// Delete a comment
+exports.deleteComment = (req, res) => {
+	const document = db.doc(`/comments/${req.params.commentId}`);
+
+	document
+		.get()
+		.then((doc) => {
+			if (!doc.exists) {
+				return res.status(404).json({ error: 'Comment not found' });
 			} else if (doc.data().handle !== req.user.userHandle) {
 				return res.status(403).json({ error: 'Unauthorized' });
 			} else {

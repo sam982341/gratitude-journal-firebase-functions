@@ -19,6 +19,7 @@ const {
 	getAllPostsInfinite,
 	getAllPostsInfiniteNext,
 	getUsersPostsNext,
+	deleteComment,
 } = require('./handlers/posts');
 const {
 	userSignUp,
@@ -59,6 +60,8 @@ app.post('/users/:handle/posts/next', getUsersPostsNext);
 app.get('/posts/infinite', getAllPostsInfinite);
 // Get All Posts Infinite Scroll Next Set
 app.post('/posts/infinite/next', getAllPostsInfiniteNext);
+// Delete comment
+app.delete('/comment/:commentId', FBAuth, deleteComment);
 
 //////////////////////////////////////////////////////////////////
 // User Routes
@@ -182,7 +185,7 @@ exports.createNotificationOnComment = functions.firestore
 	});
 
 // When a user updated their image, update all posts
-exports.onUserImageChange = functions.firestore
+exports.updatePostsOnUserImageChange = functions.firestore
 	.document('/users/{userId}')
 	.onUpdate((change) => {
 		if (change.before.data().imageUrl !== change.after.data().imageUrl) {
@@ -195,6 +198,26 @@ exports.onUserImageChange = functions.firestore
 					data.forEach((doc) => {
 						const post = db.doc(`/posts/${doc.id}`);
 						batch.update(post, { userImage: change.after.data().imageUrl });
+					});
+					return batch.commit();
+				});
+		} else return true;
+	});
+
+// When a user updated their image, update all comments
+exports.updateCommentsOnUserImageChange = functions.firestore
+	.document('/users/{userId}')
+	.onUpdate((change) => {
+		if (change.before.data().imageUrl !== change.after.data().imageUrl) {
+			let batch = db.batch();
+			return db
+				.collection('comments')
+				.where('userHandle', '==', change.before.data().handle)
+				.get()
+				.then((data) => {
+					data.forEach((doc) => {
+						const comment = db.doc(`/comments/${doc.id}`);
+						batch.update(comment, { userImage: change.after.data().imageUrl });
 					});
 					return batch.commit();
 				});
